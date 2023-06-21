@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 
 class PropertyController extends Controller
 {
+    public function index()
+    {
+        $properties = Property::all();
+    }
     public function store(StorePropertyRequest $request)
     {
         $this->authorize('properties-manage');
