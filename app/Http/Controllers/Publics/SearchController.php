@@ -30,6 +30,13 @@ class SearchController extends Controller
                                 radians(".$geo->long.")) + sin(radians(".$geo->lat.")) * sin(radians(`lat`)))  < 10");
                         }
                     })
+                    ->when($request->adults && $request->children,function($query) use ($request){
+                        //withWhereHas is combine of with and whereHas 
+                        $query->withWhereHas('apartments',function($query) use ($request){
+                            $query->where('capacity_adults','>=',$request->adults)
+                                    ->where('capacity_children','>=',$request->children);
+                        });
+                    })
                     ->latest()->get();
 
         return response()->json([
