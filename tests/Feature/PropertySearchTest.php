@@ -116,4 +116,38 @@ class PropertySearchTest extends TestCase
         $response->assertJsonFragment(['id'=>$property1->id]);
 
     }
+
+    public function test_property_search_by_apartment_capacity_returns_only_apartments(): void
+    {
+        $owner = User::factory()->create(['role_id'=> Role::OWNER_ROLE]);
+        $city = City::value('id');
+        $property1 = Property::factory()->create([
+            'owner_id'=> $owner->id,
+            'city_id' => $city
+        ]);
+
+         //small apartment property
+         $apartment2 = Apartment::factory()->create([
+            'name' => 'Small apartment',
+            'property_id'=> $property1->id,
+            'capacity_adults' => 1,
+            'capacity_children' => 0,
+        ]);
+
+        //large apartment property
+        $apartment1 = Apartment::factory()->create([
+            'name' => 'Large apartment',
+            'property_id'=> $property1->id,
+            'capacity_adults' => 3,
+            'capacity_children' => 2,
+        ]);
+       
+        $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1');
+        $response->assertStatus(200);
+        $response->assertJsonCount(1); //match count property values
+        $response->assertJsonCount(1, "data.0.apartments"); //0.apartment is the property first apartment data
+        $response->assertJsonPath('data.0.apartments.0.name', $apartment1->name);
+
+    }
+
 }
