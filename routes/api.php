@@ -18,7 +18,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    $data['user'] = $request->user();
+    $data['role'] = $request->user()->role;
+    $data['permissions'] = $request->user()->role->permissions;
+    return $data;
 });
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('owner/property',[PropertyController::class,'store']);
