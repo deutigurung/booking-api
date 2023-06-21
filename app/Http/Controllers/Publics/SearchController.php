@@ -14,6 +14,11 @@ class SearchController extends Controller
                     ->when($request->city,function($query) use ($request){
                         $query->where('city_id',$request->city);
                     })
+                    ->when($request->country,function($query) use ($request){
+                        $query->whereHas('city', fn($q) =>
+                          $q->where('country_id',$request->country)
+                        );
+                    })
                     ->latest()->get();
 
         return response()->json([
