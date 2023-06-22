@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Apartment extends Model
 {
     use HasFactory;
-    protected $fillable = ['apartment_type_id','property_id', 'name', 'capacity_adults', 'capacity_children','size'];
+    protected $fillable = ['apartment_type_id','property_id', 'name', 'capacity_adults', 'capacity_children','size','bathrooms'];
 
     public function property()
     {
@@ -18,5 +18,10 @@ class Apartment extends Model
     public function apartment_type()
     {
         return $this->belongsTo(ApartmentType::class);
+    }
+
+    public function rooms()
+    {
+        return $this->hasMany(Room::class);
     }
 }

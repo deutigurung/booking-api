@@ -15,6 +15,7 @@ return new class extends Migration
             $table->foreignId('apartment_type_id')->after('id')
                 ->nullable()->constrained();
             $table->unsignedInteger('size')->nullable()->after('property_id');
+            $table->unsignedInteger('bathrooms')->after('size')->default(0);
         });
     }
 
@@ -25,7 +26,7 @@ return new class extends Migration
     {
         Schema::table('apartments', function (Blueprint $table) {
             $table->dropForeign(['apartment_type_id']);
-            $table->dropColumn(['apartment_type_id','size']);
+            $table->dropColumn(['apartment_type_id','size','bathrooms']);
         });
     }
 };
