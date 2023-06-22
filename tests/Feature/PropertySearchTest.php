@@ -179,9 +179,35 @@ class PropertySearchTest extends TestCase
             'name' => 'Bedroom',
         ]);
 
+        // $room2 = Room::factory()->create([
+        //     'apartment_id'=> $apartment->id,
+        //     'room_type_id'=> $roomTypes[0]->id,
+        //     'name' => 'Bedroom 2',
+        // ]);
+
         $bed = Bed::factory()->create([
             'room_id'=> $room->id,
             'bed_type_id'=> $bedTypes[0]->id,
+        ]);
+
+        $bed2 = Bed::factory()->create([
+            'room_id'=> $room->id,
+            'bed_type_id'=> $bedTypes[0]->id,
+        ]);
+
+        $bed3 = Bed::factory()->create([
+            'room_id'=> $room->id,
+            'bed_type_id'=> $bedTypes[0]->id,
+        ]);
+
+        $bed4 = Bed::factory()->create([
+            'room_id'=> $room->id,
+            'bed_type_id'=> $bedTypes[1]->id,
+        ]);
+
+        $bed5 = Bed::factory()->create([
+            'room_id'=> $room->id,
+            'bed_type_id'=> $bedTypes[1]->id,
         ]);
 
         $response = $this->getJson('/api/search?city='.$city);
@@ -193,7 +219,14 @@ class PropertySearchTest extends TestCase
         
         // check that bed list of 1 room with 1 bed
         // $response->assertJsonPath('data.0.apartments.0.bed_lists','1 '.$bedTypes[0]->name);
+        
+        // check that bed list of 1 room with 2 bed
+        // $response->assertJsonPath('data.0.apartments.0.bed_lists','2 '.str($bedTypes[0]->name)->plural());
 
+        // add one bed to that second room
+        // $response->assertJsonPath('data.0.apartments.0.bed_lists','3 '.str($bedTypes[0]->name)->plural());
 
+        //add another bed with a different type to that second room
+        $response->assertJsonPath('data.0.apartments.0.bed_lists', '5 beds(3 ' .str($bedTypes[0]->name)->plural() .', 2 '.str($bedTypes[1]->name)->plural().')');
     }
 }

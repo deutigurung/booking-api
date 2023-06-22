@@ -42,6 +42,8 @@ class SearchController extends Controller
 
         return response()->json([
             'data' => SearchResource::collection($property)
+            // 'data' => $property
+
         ]);
                 
     }
