@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,6 +36,17 @@ class Property extends Model
                 $property->owner_id = auth()->user()->id;
             });
         }
+    }
+
+    //defining accessor methods
+    protected function address(): Attribute
+    {
+        return Attribute::make(
+                get: fn () => 
+                $this->address_street.','.
+                $this->address_postcode.','.
+                $this->city->name,
+        );
     }
 
     public function city()

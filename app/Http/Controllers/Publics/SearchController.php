@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Publics;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SearchResource;
 use App\Models\GeoObject;
 use App\Models\Property;
 use Illuminate\Http\Request;
@@ -40,7 +41,7 @@ class SearchController extends Controller
                     ->latest()->get();
 
         return response()->json([
-            'data' => $property
+            'data' => SearchResource::collection($property)
         ]);
                 
     }
