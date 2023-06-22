@@ -28,5 +28,7 @@ class DatabaseSeeder extends Seeder
 
         // \App\Models\Apartment::factory(5)->create();
 
+        // $this->call(ApartmentTypeSeeder::class);
+
     }
 }
