@@ -35,7 +35,12 @@ class SearchController extends Controller
                         //withWhereHas is combine of with and whereHas 
                         $query->withWhereHas('apartments',function($query) use ($request){
                             $query->where('capacity_adults','>=',$request->adults)
-                                    ->where('capacity_children','>=',$request->children);
+                                    ->where('capacity_children','>=',$request->children)
+                                    ->orderBy('capacity_adults') 
+                                    ->orderBy('capacity_children')
+                                    ->take(1);
+                                    ;
+
                         });
                     })
                     ->latest()->get();
