@@ -3,12 +3,16 @@
 namespace Tests\Feature;
 
 use App\Models\Apartment;
+use App\Models\Bed;
+use App\Models\BedType;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\GeoObject;
 use App\Models\Property;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Room;
+use App\Models\RoomType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -150,4 +154,46 @@ class PropertySearchTest extends TestCase
 
     }
 
+    public function test_property_search_by_beds_list(): void
+    {
+        $owner = User::factory()->create(['role_id'=> Role::OWNER_ROLE]);
+        $city = City::value('id');
+        $roomTypes = RoomType::all();
+        $bedTypes = BedType::all();
+
+        $property1 = Property::factory()->create([
+            'owner_id'=> $owner->id,
+            'city_id' => $city
+        ]);
+
+        $apartment = Apartment::factory()->create([
+            'name' => 'Small apartment',
+            'property_id'=> $property1->id,
+            'capacity_adults' => 1,
+            'capacity_children' => 0,
+        ]);
+
+        $room = Room::factory()->create([
+            'apartment_id'=> $apartment->id,
+            'room_type_id'=> $roomTypes[0]->id,
+            'name' => 'Bedroom',
+        ]);
+
+        $bed = Bed::factory()->create([
+            'room_id'=> $room->id,
+            'bed_type_id'=> $bedTypes[0]->id,
+        ]);
+
+        $response = $this->getJson('/api/search?city='.$city);
+        $response->assertStatus(200);
+        $response->assertJsonCount(1);
+        $response->assertJsonCount(1,"data.0.apartments");
+        // check that bed list if empty if no beds
+        // $response->assertJsonPath('data.0.apartments.0.bed_lists','');
+        
+        // check that bed list of 1 room with 1 bed
+        // $response->assertJsonPath('data.0.apartments.0.bed_lists','1 '.$bedTypes[0]->name);
+
+
+    }
 }
