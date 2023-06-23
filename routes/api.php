@@ -6,6 +6,7 @@ use App\Http\Controllers\Owner\PropertyController;
 use App\Http\Controllers\Publics\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Publics;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +39,9 @@ Route::middleware('auth:sanctum')->group(function(){
 
 
 Route::get('search',SearchController::class);
-Route::get('properties/{property}', \App\Http\Controllers\Publics\PropertyController::class);
+Route::get('properties/{property}', Publics\PropertyController::class);
+Route::get('apartments/{apartment}', Publics\ApartmentController::class);
+
 
 
 
