@@ -17,7 +17,7 @@ class BedFactory extends Factory
     public function definition(): array
     {
         return [
-            'room_id' => random_int(3,12),
+            'room_id' => random_int(1,5),
             'bed_type_id' => random_int(1,4),
             'name' => fake()->text(20),
         ];

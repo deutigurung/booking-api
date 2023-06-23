@@ -33,5 +33,6 @@ class DatabaseSeeder extends Seeder
         // \App\Models\Room::factory(5)->create();
         // \App\Models\Bed::factory(5)->create();
 
+            // $this->call(FacilitySeeder::class);
     }
 }
