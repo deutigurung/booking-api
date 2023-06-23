@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Publics;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SearchResource;
+use App\Models\Facility;
 use App\Models\GeoObject;
 use App\Models\Property;
 use Illuminate\Http\Request;
@@ -14,7 +15,8 @@ class SearchController extends Controller
     //https://inovector.com/blog/get-locations-nearest-the-user-location-with-mysql-php-in-laravel
     public function __invoke(Request $request)
     {
-        $property = Property::with('city','apartments.apartment_type','apartments.rooms.beds.bed_type')
+        $properties = Property::with('city','apartments.apartment_type',
+                        'apartments.rooms.beds.bed_type','facilities')
                     ->when($request->city,function($query) use ($request){
                         $query->where('city_id',$request->city);
                     })
@@ -44,11 +46,17 @@ class SearchController extends Controller
                         });
                     })
                     ->latest()->get();
-
+        $facilities = Facility::query()->withCount(['properties'=> function($q) use ($properties){
+                            $q->whereIn('properties.id',$properties->pluck('id'));
+                        }])->get()
+                        ->where('properties_count','>',0)
+                        ->sortByDesc('properties_count')
+                        ->pluck('properties_count','name');
+                        
         return response()->json([
-            'data' => SearchResource::collection($property)
+            'properties' => SearchResource::collection($properties),
+            'facilities' => $facilities
             // 'data' => $property
-
         ]);
                 
     }

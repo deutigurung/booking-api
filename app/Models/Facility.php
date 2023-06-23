@@ -20,4 +20,9 @@ class Facility extends Model
     {
         return $this->belongsToMany(Apartment::class, 'apartment_facility','apartment_id','facility_id');
     }
+
+    public function properties()
+    {
+        return $this->belongsToMany(Property::class);
+    }
 }
