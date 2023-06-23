@@ -20,6 +20,7 @@ class ApartmentSearchResource extends JsonResource
             'size' => $this->size,
             'bed_lists' => $this->bed_lists,
             'bathrooms' => $this->bathrooms,
+            'facilities' => FacilityResource::collection($this->whenLoaded('facilities')),
         ];
     }
 }
