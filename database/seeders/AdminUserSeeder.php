@@ -13,12 +13,20 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
+        $admin = User::create([
             'name' => 'Administrator',
             'email' => 'superadmin@gmail.com',
             'password' => bcrypt('password'),
             'email_verified_at' => now(),
             'role_id' => 1, // Administrator
+        ]);
+
+        $owner = User::create([
+            'name' => 'Property Owner',
+            'email' => 'owner@gmail.com',
+            'password' => bcrypt('password'),
+            'email_verified_at' => now(),
+            'role_id' => 2, // Property owner
         ]);
     }
 }

@@ -37,7 +37,7 @@ class PropertySearchTest extends TestCase
         $property2 = Property::factory()->create(['owner_id'=> $owner->id,'city_id'=> $cities[1]]);
         $response = $this->getJson('/api/search?city='.$cities[0]);
         $response->assertStatus(200);
-        $response->assertJsonCount(1);
+        $response->assertJsonCount(1,'properties');
          // assertJsonFragment() takes the fragment as an argument and
         //  returns true if the fragment is found in the response, and false if it is not found.
         $response->assertJsonFragment(['id'=>$property1->id]);
@@ -59,7 +59,7 @@ class PropertySearchTest extends TestCase
         ]);
         $response = $this->getJson('/api/search?country='.$countries[0]->id);
         $response->assertStatus(200);
-        $response->assertJsonCount(1);
+        $response->assertJsonCount(1,'properties');
         $response->assertJsonFragment(['id'=>$property1->id]);
 
     }
@@ -84,7 +84,7 @@ class PropertySearchTest extends TestCase
         ]);
         $response = $this->getJson('/api/search?geoobject='.$geo->id);
         $response->assertStatus(200);
-        $response->assertJsonCount(1);
+        $response->assertJsonCount(1,'properties');
         $response->assertJsonFragment(['id'=>$property1->id]);
 
     }
@@ -116,7 +116,7 @@ class PropertySearchTest extends TestCase
         ]);
         $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1');
         $response->assertStatus(200);
-        $response->assertJsonCount(1);
+        $response->assertJsonCount(1,'properties');
         $response->assertJsonFragment(['id'=>$property1->id]);
 
     }
@@ -148,7 +148,7 @@ class PropertySearchTest extends TestCase
        
         $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1');
         $response->assertStatus(200);
-        $response->assertJsonCount(1); //match count property values
+        $response->assertJsonCount(1,'properties'); //match count property values
         $response->assertJsonCount(1, "data.0.apartments"); //0.apartment is the property first apartment data
         $response->assertJsonPath('data.0.apartments.0.name', $apartment1->name);
 
@@ -212,8 +212,8 @@ class PropertySearchTest extends TestCase
 
         $response = $this->getJson('/api/search?city='.$city);
         $response->assertStatus(200);
-        $response->assertJsonCount(1);
-        $response->assertJsonCount(1,"data.0.apartments");
+        $response->assertJsonCount(1,'properties');
+        $response->assertJsonCount(1,"properties.0.apartments");
         // check that bed list if empty if no beds
         // $response->assertJsonPath('data.0.apartments.0.bed_lists','');
         
@@ -227,7 +227,7 @@ class PropertySearchTest extends TestCase
         // $response->assertJsonPath('data.0.apartments.0.bed_lists','3 '.str($bedTypes[0]->name)->plural());
 
         //add another bed with a different type to that second room
-        $response->assertJsonPath('data.0.apartments.0.bed_lists', '5 beds(3 ' .str($bedTypes[0]->name)->plural() .', 2 '.str($bedTypes[1]->name)->plural().')');
+        $response->assertJsonPath('properties.0.apartments.0.bed_lists', '5 beds(3 ' .str($bedTypes[0]->name)->plural() .', 2 '.str($bedTypes[1]->name)->plural().')');
     }
 
     public function test_property_search_returns_one_best_apartment_per_property(): void
@@ -266,9 +266,9 @@ class PropertySearchTest extends TestCase
         $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1');
         // dd($response->json());
         $response->assertStatus(200);
-        $response->assertJsonCount(1); 
-        $response->assertJsonCount(1, 'data.0.apartments');
-        $response->assertJsonPath('data.0.apartments.0.name', $apartment3->name);
+        $response->assertJsonCount(1,'properties'); 
+        $response->assertJsonCount(1, 'properties.0.apartments');
+        $response->assertJsonPath('properties.0.apartments.0.name', $apartment3->name);
 
     }
 }
