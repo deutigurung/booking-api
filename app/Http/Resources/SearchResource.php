@@ -20,7 +20,8 @@ class SearchResource extends JsonResource
             'address' => $this->address, //getting mutators
             'lat' => $this->lat,
             'long' => $this->long,
-            'apartments' => ApartmentSearchResource::collection($this->apartments)
+            'apartments' => ApartmentSearchResource::collection($this->apartments),
+            'photos' => $this->photos
         ];
     }
 }

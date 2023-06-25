@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Property extends Model
+class Property extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory , InteractsWithMedia;
 
     protected $fillable = [
         'owner_id',
@@ -67,5 +69,16 @@ class Property extends Model
     public function facilities()
     {
         return $this->belongsToMany(Facility::class);
+    }
+
+    protected function photos(): Attribute
+    {
+        $photos = [];
+        $property = Property::find($this->id);
+        $medias = $property->getMedia('*');
+        foreach($medias as $m){
+            $photos[] = $m->getUrl();
+        }
+        return Attribute::make(  get: fn () =>  $photos);
     }
 }
