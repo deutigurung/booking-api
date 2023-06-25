@@ -45,7 +45,13 @@ class SearchController extends Controller
 
                         });
                     })
+                    ->when($request->facilities,function($q) use ($request){
+                        $q->whereHas('facilities',function($query)  use ($request){
+                            $query->whereIn('facilities.id',$request->facilities);
+                        });
+                    })
                     ->latest()->get();
+                    
         $facilities = Facility::query()->withCount(['properties'=> function($q) use ($properties){
                             $q->whereIn('properties.id',$properties->pluck('id'));
                         }])->get()

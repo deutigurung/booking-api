@@ -7,6 +7,7 @@ use App\Models\Bed;
 use App\Models\BedType;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\Facility;
 use App\Models\GeoObject;
 use App\Models\Property;
 use App\Models\User;
@@ -269,6 +270,56 @@ class PropertySearchTest extends TestCase
         $response->assertJsonCount(1,'properties'); 
         $response->assertJsonCount(1, 'properties.0.apartments');
         $response->assertJsonPath('properties.0.apartments.0.name', $apartment3->name);
+
+    }
+    
+    public function test_property_search_filters_by_facilities()
+    {
+        $owner = User::factory()->create(['role_id'=> Role::OWNER_ROLE]);
+        $city = City::value('id');
+        $property1 = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city,
+        ]);
+        $apartment1 = Apartment::factory()->create([
+            'name' => 'Mid size apartment',
+            'property_id' => $property1->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+        $property2 = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city,
+        ]);
+        $apartment2 = Apartment::factory()->create([
+            'name' => 'Mid size apartment',
+            'property_id' => $property2->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+
+        //first -> no facilities exits
+        // $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1');
+        // $response->assertStatus(200);
+        // $response->assertJsonCount(2,'properties'); 
+
+        // second -> filter by facility, 0 properties returned
+        $facility = Facility::create(['name'=>'new facility']);
+        // $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1&facilities[]='.$facility->id);
+        // $response->assertStatus(200);
+        // $response->assertJsonCount(0,'properties'); 
+
+        // third -> attach facility to property, filter by facility, 1 property returned
+        $property1->facilities()->attach($facility->id);
+        // $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1&facilities[]='.$facility->id);
+        // $response->assertStatus(200);
+        // $response->assertJsonCount(1,'properties'); 
+
+        // fourth -> attach facility to a DIFFERENT property, filter by facility, 2 properties returned
+        $property2->facilities()->attach($facility->id);
+        $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1&facilities[]='.$facility->id);
+        $response->assertStatus(200);
+        $response->assertJsonCount(2,'properties'); 
 
     }
 }
