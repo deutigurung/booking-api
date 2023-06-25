@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
 
         // $this->call(FacilitySeeder::class);
         // $this->call(FacilityPropertySeeder::class);
+        // \App\Models\ApartmentPrice::factory(2)->create();
 
     }
 }

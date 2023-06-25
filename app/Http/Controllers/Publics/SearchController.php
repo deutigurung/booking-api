@@ -15,8 +15,14 @@ class SearchController extends Controller
     //https://inovector.com/blog/get-locations-nearest-the-user-location-with-mysql-php-in-laravel
     public function __invoke(Request $request)
     {
-        $properties = Property::with('city','apartments.apartment_type',
-                        'apartments.rooms.beds.bed_type','facilities')
+        $properties = Property::with(['city','apartments.apartment_type',
+                        'apartments.rooms.beds.bed_type','facilities',
+                        'apartments.prices' => function($query) use ($request){
+                            $query->validForRange([
+                                $request->start_date ?? now()->addDay()->toDateString(),
+                                $request->end_date ?? now()->addDays(2)->toDateString(),
+                            ]);
+                        }])
                     ->when($request->city,function($query) use ($request){
                         $query->where('city_id',$request->city);
                     })
