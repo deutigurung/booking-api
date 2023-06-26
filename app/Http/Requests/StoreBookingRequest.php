@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\ApartmentAvailableRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBookingRequest extends FormRequest
@@ -22,11 +23,11 @@ class StoreBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'apartment_id' => 'required|exists:apartments,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'guest_adults' => 'integer',
-            'guest_children' => 'integer',
+            'apartment_id' => ['required',new ApartmentAvailableRule],
+            'start_date' => ['required','date'],
+            'end_date' => ['required','date'],
+            'guest_adults' => ['integer'],
+            'guest_children' => ['integer'],
         ];
     }
 }

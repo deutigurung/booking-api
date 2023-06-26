@@ -30,6 +30,7 @@ class BookingController extends Controller
      */
     public function store(StoreBookingRequest $request)
     {
+        dd($request->all());
         $this->authorize('bookings-manage');
         $booking = auth()->user()->bookings()->create($request->validated());
         return new BookingResource($booking);
