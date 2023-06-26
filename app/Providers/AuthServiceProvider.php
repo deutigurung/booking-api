@@ -26,5 +26,9 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('properties-manage',function(User $user){
             return $user->role_id === Role::OWNER_ROLE;
         });
+
+        Gate::define('bookings-manage',function(User $user){
+            return $user->role_id === Role::USER_ROLE;
+        });
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Publics\SearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Publics;
+use App\Http\Controllers\User\BookingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,10 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::prefix('owner/')->group(function(){
         Route::get('all-properties',[PropertyController::class,'index']);
         Route::post('property',[PropertyController::class,'store']);
+    });
 
+    Route::prefix('user/')->group(function(){
+        Route::resource('bookings',BookingController::class);
     });
 });
 
