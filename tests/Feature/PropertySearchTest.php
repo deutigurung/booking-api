@@ -320,6 +320,62 @@ class PropertySearchTest extends TestCase
         $response = $this->getJson('/api/search?city='.$city.'&adults=2&children=1&facilities[]='.$facility->id);
         $response->assertStatus(200);
         $response->assertJsonCount(2,'properties'); 
+    }
 
+    public function test_property_search_filter_by_price()
+    {
+        $owner = User::factory()->create(['role_id'=> Role::OWNER_ROLE]);
+        $city = City::value('id');
+        $property1 = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city,
+        ]);
+        $apartment1 = Apartment::factory()->create([
+            'name' => 'first floor apartment',
+            'property_id' => $property1->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+        $apartment1->prices()->create([
+            'start_date' => now(),
+            'end_date' => now()->addMonth(),
+            'price' => 80,
+        ]);
+
+        $property2 = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city,
+        ]);
+        $apartment2 = Apartment::factory()->create([
+            'name' => 'top floor apartment',
+            'property_id' => $property2->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+        $apartment2->prices()->create([
+            'start_date' => now(),
+            'end_date' => now()->addMonth(),
+            'price' => 150,
+        ]);
+        // first case - no price range: both apartment price returned
+        $response = $this->getJson('/api/search?city=' . $city . '&adults=2&children=1');
+        $response->assertStatus(200);
+        $response->assertJsonCount(2, 'properties');
+
+        // second case - min price set: 1 apartment price returned
+        $response = $this->getJson('/api/search?city=' . $city . '&adults=2&children=1&price_from=100');
+        $response->assertStatus(200);
+        $response->assertJsonCount(1, 'properties');
+
+         // third case - max price set: 2 apartment price returned
+         $response = $this->getJson('/api/search?city=' . $city . '&adults=2&children=1&price_to=200');
+         $response->assertStatus(200);
+         $response->assertJsonCount(2, 'properties');
+
+          // fourth case - both price set: 0 apartment price returned
+          $response = $this->getJson('/api/search?city=' . $city . '&adults=2&children=1&price_from=90&price_to=120');
+          $response->assertStatus(200);
+          $response->assertJsonCount(0, 'properties');
+    
     }
 }

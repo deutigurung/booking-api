@@ -56,6 +56,16 @@ class SearchController extends Controller
                             $query->whereIn('facilities.id',$request->facilities);
                         });
                     })
+                    ->when($request->price_from,function($q) use ($request){
+                        $q->whereHas('apartments.prices',function($query) use ($request){
+                            $query->where('price','>=',$request->price_from);
+                        });
+                    })
+                    ->when($request->price_to,function($q) use ($request){
+                        $q->whereHas('apartments.prices',function($query) use ($request){
+                            $query->where('price','<=',$request->price_to);
+                        });
+                    })
                     ->latest()->get();
                     
         $facilities = Facility::query()->withCount(['properties'=> function($q) use ($properties){
