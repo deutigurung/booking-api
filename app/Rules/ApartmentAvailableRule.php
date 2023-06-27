@@ -26,19 +26,18 @@ class ApartmentAvailableRule implements ValidationRule, DataAwareRule
     {
         $apartment = Apartment::find($value);
         if(!$apartment) {
-            $fail('The :attribute must be uppercase.');
-            // $fail('Apartment not found');
+            $fail('Apartment not found');
         }
 
-        // if($apartment->capacity_adults < $this->data['guest_adults'] || 
-        //     $apartment->capacity_children < $this->data['guest_children']){
-        //     $fail('This apartment does not fit your requirements');
-        // }
+        if($apartment->capacity_adults < $this->data['guest_adults'] || 
+            $apartment->capacity_children < $this->data['guest_children']){
+            $fail('This apartment does not fit your requirements');
+        }
 
-        // if(Booking::where('apartment_id', $value)->validForRange([$this->data['start_date'],$this->data['end_date']])->exists())
-        // {
-        //     $fail('This apartment is not available for those dates');
-        // }
+        if(Booking::where('apartment_id', $value)->validForRange([$this->data['start_date'],$this->data['end_date']])->exists())
+        {
+            $fail('This apartment is not available for those dates');
+        }
     }
 
     public function setData(array $data)
