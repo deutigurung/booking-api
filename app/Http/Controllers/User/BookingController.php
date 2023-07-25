@@ -4,8 +4,10 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBookingRequest;
+use App\Http\Requests\UpdateBookingRequest;
 use App\Http\Resources\BookingResource;
 use Illuminate\Http\Request;
+use App\Models\Booking;
 
 class BookingController extends Controller
 {
@@ -54,9 +56,15 @@ class BookingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Booking $booking, UpdateBookingRequest $request)
     {
-        //
+        $this->authorize('bookings-manage');
+
+        if($booking->user_id != auth()->id()){
+            abort(403);
+        }
+        $booking->update($request->validated());
+        return new BookingResource($booking);
     }
 
     /**

@@ -12,7 +12,7 @@ class Booking extends Model
     use HasFactory , SoftDeletes, ValidForRange;
 
     protected $fillable = ['apartment_id','user_id','start_date','end_date','guest_adults','guest_children',
-        'total_price'];
+        'total_price', 'rating', 'review_comment',];
 
     protected $casts = [
         'start_date' => 'date',
