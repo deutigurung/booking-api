@@ -66,6 +66,77 @@ class BookingsTest extends TestCase
 
     }
 
+    public function test_user_can_get_only_their_bookings_data(){
+        $user1 = User::factory()->create(['role_id' => Role::USER_ROLE]);
+        $user2 = User::factory()->create(['role_id' => Role::USER_ROLE]);
+
+        $apartment = $this->create_apartment();
+        $booking1 = Booking::create([
+            'apartment_id' => $apartment->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guest_adults' => 3,
+            'guest_children' => 1,
+        ]);
+
+        $booking2 = Booking::create([
+            'apartment_id' => $apartment->id,
+            'user_id' => $user2->id,
+            'start_date' => now()->addDay(3),
+            'end_date' => now()->addDays(4),
+            'guest_adults' => 2,
+            'guest_children' => 0,
+        ]);
+
+        //case 1: user can only view their own booking list
+        $response = $this->actingAs($user1)->getJson('/api/user/bookings/');
+        $response->assertStatus(200);
+        $response->assertJsonCount(1);
+        $response->assertJsonFragment(['guest_adults' => 3]);
+
+        //case 2: user cannot view other user bookings
+        $response = $this->actingAs($user1)->getJson('/api/user/bookings/' . $booking1->id);
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['guest_adults' => 3]);
+ 
+        $response = $this->actingAs($user1)->getJson('/api/user/bookings/'.$booking2->id);
+        $response->assertStatus(403);
+    }
+
+    public function test_user_can_cancel_their_booking_but_still_can_view(){
+        $user1 = User::factory()->create(['role_id' => Role::USER_ROLE]);
+        $user2 = User::factory()->create(['role_id' => Role::USER_ROLE]);
+
+        $apartment = $this->create_apartment();
+        $booking1 = Booking::create([
+            'apartment_id' => $apartment->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guest_adults' => 3,
+            'guest_children' => 1,
+        ]);
+
+        //case 1: user can cancel their own booking list
+        $response = $this->actingAs($user2)->deleteJson('/api/user/bookings/'.$booking1->id);
+        $response->assertStatus(403); 
+ 
+        $response = $this->actingAs($user1)->deleteJson('/api/user/bookings/'.$booking1->id);
+        $response->assertStatus(204); 
+
+        //case 2: today cancel bookings
+        $response = $this->actingAs($user1)->getJson('/api/user/bookings/');
+        $response->assertStatus(200); 
+        $response->assertJsonFragment(['cancelled_at' => now()->toDateString()]);
+
+        //case 3: view cancel bookings
+        $response = $this->actingAs($user1)->getJson('/api/user/bookings/'.$booking1->id);
+        $response->assertStatus(200); 
+        $response->assertJsonFragment(['cancelled_at' => now()->toDateString()]);
+
+       
+    }
 
     public function test_user_can_post_rating_for_their_booking(){
         $user1 = User::factory()->create(['role_id' => Role::USER_ROLE]);

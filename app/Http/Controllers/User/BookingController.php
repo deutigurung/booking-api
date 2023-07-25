@@ -16,7 +16,13 @@ class BookingController extends Controller
      */
     public function index()
     {
-        //
+        $this->authorize('bookings-manage');
+        $bookings = auth()->user()->bookings()    
+                ->with('apartment.property')
+                ->withTrashed()
+                ->orderBy('start_date')
+                ->get();
+        return BookingResource::collection($bookings);
     }
 
     /**
@@ -40,9 +46,14 @@ class BookingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $this->authorize('bookings-manage');
+        $booking = Booking::where('id', $id)->withTrashed()->first();
+        if ($booking->user_id != auth()->id()) {
+            abort(403);
+        }
+        return new BookingResource($booking);
     }
 
     /**
@@ -70,8 +81,14 @@ class BookingController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Booking $booking)
     {
-        //
+        $this->authorize('bookings-manage');
+ 
+        if ($booking->user_id != auth()->id()) {
+            abort(403);
+        }
+        $booking->delete();
+        return response()->noContent();
     }
 }
