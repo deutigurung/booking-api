@@ -22,9 +22,9 @@ class PropertyFactory extends Factory
     {
         // The method value('id') is a shorter way of doing ->first()->id.
         return [
-            'owner_id' => User::where('role_id',Role::OWNER_ROLE)->value('id'),
+            //'owner_id' => User::where('role_id',Role::OWNER_ROLE)->inRandomOrder()->value('id'),
             'name' => fake()->text(20),
-            'city_id' => City::value('id'),
+            //'city_id' => City::inRandomOrder()->value('id'),
             'address_street' => fake()->streetAddress(),
             'address_postcode' => fake()->postcode(),
             'lat' => fake()->latitude(),
