@@ -15,7 +15,7 @@ class SearchController extends Controller
     //https://inovector.com/blog/get-locations-nearest-the-user-location-with-mysql-php-in-laravel
     public function __invoke(Request $request)
     {
-        $properties = Property::with(['city','apartments.apartment_type',
+        $propertiesQuery = Property::with(['city','apartments.apartment_type',
                         'apartments.rooms.beds.bed_type','facilities',
                         'apartments.prices' => function($query) use ($request){
                             $query->validForRange([
@@ -67,18 +67,20 @@ class SearchController extends Controller
                             $query->where('price','<=',$request->price_to);
                         });
                     })
-                    ->orderBy('bookings_avg_rating', 'desc')
-                    ->get();
-                    
-        $facilities = Facility::query()->withCount(['properties'=> function($q) use ($properties){
-                            $q->whereIn('properties.id',$properties->pluck('id'));
+                    ->orderBy('bookings_avg_rating', 'desc');
+        
+            
+        $facilities = Facility::query()->withCount(['properties'=> function($q) use ($propertiesQuery){
+                            $q->whereIn('properties.id',$propertiesQuery->pluck('id'));
                         }])->get()
                         ->where('properties_count','>',0)
                         ->sortByDesc('properties_count')
                         ->pluck('properties_count','name');
-                        
+        
+        $properties = $propertiesQuery->paginate()->withQueryString();
+                
         return response()->json([
-            'properties' => SearchResource::collection($properties),
+            'properties' => SearchResource::collection($properties)->response()->getData(true),
             'facilities' => $facilities
         ]);
                 
