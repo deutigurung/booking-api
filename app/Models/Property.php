@@ -81,4 +81,9 @@ class Property extends Model implements HasMedia
         }
         return Attribute::make(  get: fn () =>  $photos);
     }
+
+    public function bookings()
+    {
+        return $this->hasManyThrough(Booking::class,Apartment::class) ;
+    }
 }

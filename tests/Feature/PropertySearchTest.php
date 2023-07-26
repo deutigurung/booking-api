@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Apartment;
 use App\Models\Bed;
 use App\Models\BedType;
+use App\Models\Booking;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Facility;
@@ -377,5 +378,77 @@ class PropertySearchTest extends TestCase
           $response->assertStatus(200);
           $response->assertJsonCount(0, 'properties');
     
+    }
+
+    public function test_properties_show_correct_rating_and_order_by_it()
+    {
+        $owner = User::factory()->create(['role_id'=> Role::OWNER_ROLE]);
+        $city = City::value('id');
+        $property1 = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city,
+        ]);
+        $apartment1 = Apartment::factory()->create([
+            'name' => 'first floor apartment',
+            'property_id' => $property1->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+
+        $property2 = Property::factory()->create([
+            'owner_id' => $owner->id,
+            'city_id' => $city,
+        ]);
+        $apartment2 = Apartment::factory()->create([
+            'name' => 'top floor apartment',
+            'property_id' => $property2->id,
+            'capacity_adults' => 2,
+            'capacity_children' => 1,
+        ]);
+
+        $user1 = User::factory()->create(['role_id'=> Role::USER_ROLE]);
+        $user2 = User::factory()->create(['role_id'=> Role::USER_ROLE]);
+
+        $booking1 = Booking::create([
+            'apartment_id' => $apartment1->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guest_adults' => 3,
+            'guest_children' => 1,
+            'rating' => 9,
+            'review_comment' => 'Excellent !, I love it very much and have wonderful time.'
+        ]);
+
+        $booking2 = Booking::create([
+            'apartment_id' => $apartment2->id,
+            'user_id' => $user2->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guest_adults' => 3,
+            'guest_children' => 1,
+            'rating' => 2,
+            'review_comment' => 'Worst , I am very much disappoint. No wifi not very good services'
+        ]);
+
+        $booking3 = Booking::create([
+            'apartment_id' => $apartment2->id,
+            'user_id' => $user1->id,
+            'start_date' => now()->addDay(),
+            'end_date' => now()->addDays(2),
+            'guest_adults' => 3,
+            'guest_children' => 1,
+            'rating' => 5,
+            'review_comment' => 'Not so much good as expected but not soo bad also. Its an average'
+        ]);
+
+        $response = $this->getJson('/api/search?city=' . $city . '&adults=2&children=1');
+        $response->assertStatus(200);
+        $response->assertJsonCount(2,'properties');
+        //booking rating of property 1
+        $this->assertEquals(9.0000,$response->json('properties')[0]['avg_rating']);
+        //booking rating of property 2
+        $this->assertEquals(3.5000,$response->json('properties')[1]['avg_rating']);
+
     }
 }

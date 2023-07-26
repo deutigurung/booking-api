@@ -23,6 +23,7 @@ class SearchController extends Controller
                                 $request->end_date ?? now()->addDays(2)->toDateString(),
                             ]);
                         }])
+                    ->withAvg('bookings','rating')
                     ->when($request->city,function($query) use ($request){
                         $query->where('city_id',$request->city);
                     })
@@ -66,7 +67,8 @@ class SearchController extends Controller
                             $query->where('price','<=',$request->price_to);
                         });
                     })
-                    ->latest()->get();
+                    ->orderBy('bookings_avg_rating', 'desc')
+                    ->get();
                     
         $facilities = Facility::query()->withCount(['properties'=> function($q) use ($properties){
                             $q->whereIn('properties.id',$properties->pluck('id'));
@@ -78,7 +80,6 @@ class SearchController extends Controller
         return response()->json([
             'properties' => SearchResource::collection($properties),
             'facilities' => $facilities
-            // 'data' => $property
         ]);
                 
     }

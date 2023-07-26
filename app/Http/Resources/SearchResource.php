@@ -21,7 +21,8 @@ class SearchResource extends JsonResource
             'lat' => $this->lat,
             'long' => $this->long,
             'apartments' => ApartmentSearchResource::collection($this->apartments),
-            'photos' => $this->photos
+            'photos' => $this->photos,
+            'avg_rating' => $this->bookings_avg_rating,
         ];
     }
 }
