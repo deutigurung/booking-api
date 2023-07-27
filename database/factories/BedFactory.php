@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Room;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,7 @@ class BedFactory extends Factory
     public function definition(): array
     {
         return [
-            'room_id' => random_int(1,5),
+            'room_id' => Room::inRandomOrder()->value('id'),
             'bed_type_id' => random_int(1,4),
             'name' => fake()->text(20),
         ];

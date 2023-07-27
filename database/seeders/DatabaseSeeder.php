@@ -31,14 +31,14 @@ class DatabaseSeeder extends Seeder
 
         // \App\Models\Apartment::factory(5)->create();
 
-        // $this->call(ApartmentTypeSeeder::class);
-        // $this->call(RoomTypeSeeder::class);
-        // \App\Models\Room::factory(5)->create();
-        // \App\Models\Bed::factory(5)->create();
+        //  $this->call(ApartmentTypeSeeder::class);
+        //  $this->call(RoomTypeSeeder::class);
+        //  \App\Models\Room::factory(150)->create();
+        //  \App\Models\Bed::factory(500)->create();
 
-        // $this->call(FacilitySeeder::class);
+        //  $this->call(FacilitySeeder::class);
         // $this->call(FacilityPropertySeeder::class);
-        // \App\Models\ApartmentPrice::factory(2)->create();
+        // \App\Models\ApartmentPrice::factory(200)->create();
 
     }
 }

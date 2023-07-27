@@ -18,7 +18,7 @@ class ApartmentPriceFactory extends Factory
     public function definition(): array
     {
         return [
-            'apartment_id' => Apartment::value('id'),
+            'apartment_id' => Apartment::inRandomOrder()->value('id'),
             'start_date' => now()->subDays(7),
             'end_date' => now()->addMonth(),
             'price' => rand(100, 500),

@@ -18,9 +18,9 @@ class RoomFactory extends Factory
     public function definition(): array
     {
         return [
-            'apartment_id' => Apartment::value('id'),
+            'apartment_id' => Apartment::inRandomOrder()->value('id'),
             'room_type_id' => random_int(1,3),
-            'name' => fake()->text(20),
+            'name' => 'Room -'.random_int(100,999),
         ];
     }
 }

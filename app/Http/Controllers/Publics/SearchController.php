@@ -16,14 +16,13 @@ class SearchController extends Controller
     public function __invoke(Request $request)
     {
         $propertiesQuery = Property::with(['city','apartments.apartment_type',
-                        'apartments.rooms.beds.bed_type','facilities',
+                        'apartments.beds.bed_type','facilities',
                         'apartments.prices' => function($query) use ($request){
                             $query->validForRange([
                                 $request->start_date ?? now()->addDay()->toDateString(),
                                 $request->end_date ?? now()->addDays(2)->toDateString(),
                             ]);
                         }])
-                    ->withAvg('bookings','rating')
                     ->when($request->city,function($query) use ($request){
                         $query->where('city_id',$request->city);
                     })
@@ -66,8 +65,7 @@ class SearchController extends Controller
                         $q->whereHas('apartments.prices',function($query) use ($request){
                             $query->where('price','<=',$request->price_to);
                         });
-                    })
-                    ->orderBy('bookings_avg_rating', 'desc');
+                    });
         
             
         $facilities = Facility::query()->withCount(['properties'=> function($q) use ($propertiesQuery){
@@ -77,7 +75,9 @@ class SearchController extends Controller
                         ->sortByDesc('properties_count')
                         ->pluck('properties_count','name');
         
-        $properties = $propertiesQuery->paginate()->withQueryString();
+        $properties = $propertiesQuery->withAvg('bookings', 'rating')
+                    ->orderBy('bookings_avg_rating', 'desc')
+                    ->paginate()->withQueryString();
                 
         return response()->json([
             'properties' => SearchResource::collection($properties)->response()->getData(true),
