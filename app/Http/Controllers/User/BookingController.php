@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Requests\UpdateBookingRequest;
 use App\Http\Resources\BookingResource;
+use App\Jobs\UpdatePropertyRatingJob;
 use Illuminate\Http\Request;
 use App\Models\Booking;
 
@@ -75,6 +76,9 @@ class BookingController extends Controller
             abort(403);
         }
         $booking->update($request->validated());
+
+        dispatch(new UpdatePropertyRatingJob($booking));
+        
         return new BookingResource($booking);
     }
 

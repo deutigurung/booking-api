@@ -19,7 +19,7 @@ class Property extends Model implements HasMedia
         'address_street',
         'address_postcode',
         'lat',
-        'long',
+        'long','bookings_avg_rating'
     ];
     /*
         In this method, the Property model has a owner_id field that is automatically populated 

@@ -75,9 +75,9 @@ class SearchController extends Controller
                         ->sortByDesc('properties_count')
                         ->pluck('properties_count','name');
         
-        $properties = $propertiesQuery->withAvg('bookings', 'rating')
+        $properties = $propertiesQuery
                     ->orderBy('bookings_avg_rating', 'desc')
-                    ->paginate()->withQueryString();
+                    ->paginate(10)->withQueryString();
                 
         return response()->json([
             'properties' => SearchResource::collection($properties)->response()->getData(true),
